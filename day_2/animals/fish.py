@@ -2,10 +2,10 @@
 
 
 
-class Mammals:
+class Fish:
     def __init__(self):
         ''' Constructor for this class. '''
-        self.members = ['Tiger', 'Elephant', 'Wild Cat']
+        self.members = ['Shark', 'Tuna', 'Salmon']
 
 
     def printMembers(self):
