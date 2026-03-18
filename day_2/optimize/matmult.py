@@ -39,12 +39,12 @@ result_opt = np.array(result_opt)
 
 start = time.time()
 # iterate through rows of X
-cY = list(zip(*Y)) # Take transpose of Y, then cast into a list object
+Yt = list(zip(*Y)) # Take transpose of Y, then cast into a list object
 for i in range(len(X)):
     rX = X[i] # Save row of X
     # iterate through columns of Y
     for j in range(len(Y[0])):
-        cYj = cY[j] # column j of Y
+        cY = Yt[j] # column j of Y (row of the transposed matrix)
         result_opt[i][j] = sum(a * b for a, b in zip(rX, cYj)) # replace the last loop by this sum
 elapsed_opt = time.time() - start  
 
