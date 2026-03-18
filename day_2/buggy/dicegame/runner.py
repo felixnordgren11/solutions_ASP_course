@@ -6,21 +6,19 @@ class GameRunner:
 
     def __init__(self):
         self.dice = Die.create_dice(5)
-        #self.reset()
+        self.reset()
+
+
+
+    def reset(self):
         self.round = 1
         self.wins = 0
         self.loses = 0
 
-
-    #def reset(self):
-    #    self.round = 1
-    #    self.wins = 0
-    #    self.loses = 0
-
     def answer(self):
         total = 0
         for die in self.dice:
-            total += 1 * die.value
+            total += 1 * die.value # multiply by dice values to get correct answer
         return total
 
     @classmethod
@@ -28,14 +26,16 @@ class GameRunner:
         # Probably counts wins or something.
         # Great variable name, 10/10.
         
-
+        # this was inside the loop before, resetting the game each round
         runner = cls()
+        #The c variable was unnecessary, just use runner.wins instead
         while True:
 
 
             print("Round {}\n".format(runner.round))
             
             for die in runner.dice:
+                # add dice rolls here since the new instance of runner isnt in the loop anymore.
                 die.roll()
                 print(die.show())
 
@@ -44,7 +44,7 @@ class GameRunner:
 
             if guess == runner.answer():
                 print("Congrats, you can add like a 5 year old...")
-                runner.wins += 1
+                runner.wins += 1 # again, remove the c
                 print(f"runner.wins = {runner.wins}")
             else:
                 print("Sorry that's wrong")
@@ -54,7 +54,7 @@ class GameRunner:
             print("Wins: {} Losses: {}".format(runner.wins, runner.loses))
             runner.round += 1
             
-            if runner.wins == 6:
+            if runner.wins == 6: # replace c by runner.wins
                 print("You won... Congrats...")
                 print("The fact it took you so long is pretty sad")
                 break

@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from math import ceil,sqrt
+
 @profile
 def gen_primes(n):
     l = range(2,n)
