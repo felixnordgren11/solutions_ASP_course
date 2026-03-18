@@ -1,61 +1,59 @@
 # Program to multiply two matrices using nested loops
-import numpy as np
-import time
 import random
-import matplotlib.pyplot as plt
-import scipy
+import time
+import numpy as np
 
-Ns = [40, 50, 100, 200, 300]#, 350, 400, 600, 700, 800]
-speedup = np.zeros(len(Ns))
-for n, N in enumerate(Ns):
-    # NxN matrix
-    X = []
-    for i in range(N):
-        X.append([random.randint(0,100) for r in range(N)])
-    
-    # Nx(N+1) matrix
-    Y = []
-    for i in range(N):
-        Y.append([random.randint(0,100) for r in range(N+1)])
-    X = np.array(X).T
-    Y = np.array(Y).T
-    
-    # result is Nx(N+1)
-    result = []
-    for i in range(N):
-        result.append([0] * (N+1))
-    start_nest = time.time()
-    # iterate through rows of X
-    for i in range(int(len(X))):
-        # iterate through columns of Y
-        for j in range(int(len(Y))):
-            # iterate through rows of Y
-            for k in range(len(Y)-1):
-                result[i][j] += X[k][i] * Y[j][k]
-    elapsed_nest = time.time() - start_nest
+N = 300
 
-    start_np = time.time()
-    import ipdb; ipdb.set_trace()
-    result_np = scipy.linalg.blas.sgemm(1.0, X, Y)
-    elapsed_np = time.time() - start_np
+# NxN matrix
+X = []
+for i in range(N):
+    X.append([random.randint(0,100) for r in range(N)])
 
-    #for i, r in enumerate(result):
-    #    for j, r_np in enumerate(result_np):
-    #        if i == j:
-    #            print(r-r_np)
+# Nx(N+1) matrix
+Y = []
+for i in range(N):
+    Y.append([random.randint(0,100) for r in range(N+1)])
+
+# result is Nx(N+1)
+result = []
+for i in range(N):
+    result.append([0] * (N+1))
+
+start = time.time()
+# iterate through rows of X
+for i in range(len(X)):
+    # iterate through columns of Y
+    for j in range(len(Y[0])):
+        # iterate through rows of Y
+        for k in range(len(Y)):
+            result[i][j] += X[i][k] * Y[k][j]
+elapsed = time.time() - start
+result = np.array(result)
+
+result_opt = []
+for i in range(N):
+    result_opt.append([0] * (N+1))
+result_opt = np.array(result_opt)
 
 
-    #for r_np in result_np:
-    #    print(r_np)
+start = time.time()
+# iterate through rows of X
+cY = list(zip(*Y)) # Take transpose of Y, then cast into a list object
+for i in range(len(X)):
+    rX = X[i] # Save row of X
+    # iterate through columns of Y
+    for j in range(len(Y[0])):
+        cYj = cY[j] # column j of Y
+        result_opt[i][j] = sum(a * b for a, b in zip(rX, cYj)) # replace the last loop by this sum
+elapsed_opt = time.time() - start  
 
 
 
-    print(f"Nested loop took {elapsed_nest} seconds to execute.")
-    print(f"Numpy  multiplication took {elapsed_np} seconds to execute.")
-    print(f"Numpy is {elapsed_nest/elapsed_np} faster at N = {N}")
-    speedup[n] = elapsed_nest/elapsed_np
 
-plt.plot(Ns, speedup)
-plt.ylabel("Speedup [s]")
-plt.xlabel("N")
-plt.show()
+if np.array_equal(np.array(result) - np.array(result_opt),np.zeros(result.shape)):
+    print("Multiplication correct") # check so multiplication is correct, should print array of zeros
+    print(f"elapsed time unoptimized: {elapsed} s")
+    print(f"elapsed time optimized: {elapsed_opt} s")
+else:
+    print(f"multiplication incorrect, difference: {result - result_opt}")
