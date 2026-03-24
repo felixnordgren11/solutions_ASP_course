@@ -5,48 +5,43 @@ import random
 import matplotlib.pyplot as plt
 import scipy
 
-Ns = [40, 50, 100, 200, 300]#, 350, 400, 600, 700, 800]
-speedup = np.zeros(len(Ns))
-for n, N in enumerate(Ns):
+
+
+Ns = [10, 50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 600, 700, 800]
+speedups = []
+
+for N in Ns:
     # NxN matrix
-    X = []
-    for i in range(N):
-        X.append([random.randint(0,100) for r in range(N)])
+    X = [[random.randint(0, 100) for _ in range(N)] for _ in range(N)]
     
     # Nx(N+1) matrix
-    Y = []
-    for i in range(N):
-        Y.append([random.randint(0,100) for r in range(N+1)])
+    Y = [[random.randint(0, 100) for _ in range(N+1)] for _ in range(N)]
     
     # result is Nx(N+1)
-    result = []
-    for i in range(N):
-        result.append([0] * (N+1))
+    result = [[0] * (N + 1) for _ in range(N)]
+
+    # Nested loop multiplication (standard logic)
     start_nest = time.time()
-    # iterate through rows of X
-    for i in range(int(len(X))):
-        # iterate through columns of Y
-        for j in range(int(len(Y))):
-            # iterate through rows of Y
-            for k in range(len(Y)):
-                result[i][j] += X[i][k] * Y[k][i]
+    for i in range(N):
+        for j in range(N + 1):
+            for k in range(N):
+                result[i][j] += X[i][k] * Y[k][j]
     elapsed_nest = time.time() - start_nest
 
     start_np = time.time()
-    #import ipdb; ipdb.set_trace()
-    result_np = scipy.linalg.blas.sgemm(1.0, X, Y)
+
+    result_np = np.matmul(np.array(X), np.array(Y))
     elapsed_np = time.time() - start_np
 
+    speedup = elapsed_nest / elapsed_np
+    speedups.append(speedup)
+    print(f"N = {N}: Nested = {elapsed_nest:.4f}s, Numpy = {elapsed_np:.4f}s, Speedup = {speedup:.2f}x")
 
-
-
-
-    print(f"Nested loop took {elapsed_nest} seconds to execute.")
-    print(f"Numpy  multiplication took {elapsed_np} seconds to execute.")
-    print(f"Numpy is {elapsed_nest/elapsed_np} faster at N = {N}")
-    speedup[n] = elapsed_nest/elapsed_np
-
-plt.plot(Ns, speedup)
-plt.ylabel("Speedup [s]")
-plt.xlabel("N")
+# plotting speedup vs array size
+plt.figure(figsize=(10, 6))
+plt.plot(Ns, speedups, marker='o', linestyle='-', color='b')
+plt.xlabel('Matrix Size (N)')
+plt.ylabel('Speedup (Nested Loop / NumPy)')
+plt.title('NumPy Speedup for Matrix Multiplication (N x N+1)')
+plt.grid(True)
 plt.show()
